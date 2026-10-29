@@ -1,6 +1,6 @@
 // Caches the app's own files so it runs with no internet connection.
 // Bump CACHE whenever a file changes so devices pick up the new version.
-const CACHE = 'hallpass-v1';
+const CACHE = 'hallpass-v2';
 const FILES = [
   './',
   'index.html',

@@ -16,7 +16,7 @@ export function checkLeave(log, cls, child, now) {
   const open = openEntries(log).filter(e => e.classId === cls.id);
 
   if (open.some(e => e.childId === child.id)) {
-    return { ok: false, message: `${child.name} is already out.` };
+    return { ok: false, alreadyOut: true, message: `${child.name} is already out.` };
   }
 
   if (r.maxTotal != null && open.length >= r.maxTotal) {

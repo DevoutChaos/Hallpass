@@ -223,6 +223,8 @@ table { border-collapse: collapse; width: 100%; }
 .table-wrap { overflow-x: auto; }
 .data td { padding: 8px; border-bottom: 1px solid #edf0ee; white-space: nowrap; }
 
+.tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fff4e5; color: #8a4b00; font-size: .75rem; font-weight: 600; }
+
 .filters { display: flex; gap: 12px; flex-wrap: wrap; }
 .filters .field { margin: 8px 0; }
 

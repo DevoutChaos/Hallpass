@@ -346,7 +346,7 @@ function historyTab() {
         ${rows
           .slice(0, MAX_ROWS)
           .map(
-            e => `<tr><td>${fmtDate(e.outAt)}</td><td>${esc(e.childName)}</td><td>${esc(e.className)}</td>
+            e => `<tr><td>${fmtDate(e.outAt)}</td><td>${esc(e.childName)}${e.override ? ' <span class="tag">override</span>' : ''}</td><td>${esc(e.className)}</td>
           <td>${fmtTime(e.outAt)}</td><td>${e.backAt ? fmtTime(e.backAt) : '<i>still out</i>'}</td><td>${minutes((e.backAt ?? now) - e.outAt)}</td></tr>`,
           )
           .join('')}
@@ -497,18 +497,49 @@ async function exitClassScreen() {
 
 // ---------- actions ----------
 
+// Tapping a refused name this many times within the window asks for the teacher PIN to override.
+const OVERRIDE_TAPS = 3;
+const OVERRIDE_WINDOW_MS = 20000;
+const refusedTaps = new Map(); // childId -> recent refused tap times
+
 function tapLeave(btn) {
   const cls = activeClass();
   const child = cls?.children.find(c => c.id === btn.dataset.id);
   if (!child) return;
   const now = Date.now();
   const result = checkLeave(state.log, cls, child, now);
-  if (!result.ok) {
-    buzz();
-    shake(btn);
-    toast(result.message, 'error');
-    return;
+  if (result.ok) return sendOut(cls, child, false);
+
+  buzz();
+  shake(btn);
+  toast(result.message, 'error');
+  if (result.alreadyOut) return;
+
+  const taps = (refusedTaps.get(child.id) || []).filter(t => now - t < OVERRIDE_WINDOW_MS);
+  taps.push(now);
+  refusedTaps.set(child.id, taps);
+  if (taps.length >= OVERRIDE_TAPS) {
+    refusedTaps.delete(child.id);
+    overrideLeave(cls, child);
   }
+}
+
+async function overrideLeave(cls, child) {
+  let subtitle = `Let ${child.name} go out anyway?`;
+  for (;;) {
+    const pin = await pinPad('Teacher override', subtitle);
+    if (pin == null) return;
+    if (pin === state.pin) break;
+    buzz();
+    subtitle = 'Wrong PIN. Try again.';
+  }
+  // The class list may have changed while the PIN pad was open.
+  if (state.mode !== 'class' || activeClass() !== cls || !cls.children.includes(child)) return;
+  if (openEntries(state.log).some(e => e.childId === child.id)) return;
+  sendOut(cls, child, true);
+}
+
+function sendOut(cls, child, override) {
   state.log.push({
     id: newId(),
     classId: cls.id,
@@ -516,13 +547,14 @@ function tapLeave(btn) {
     childId: child.id,
     childName: child.name,
     gender: child.gender,
-    outAt: now,
+    outAt: Date.now(),
     backAt: null,
+    ...(override && { override: true }),
   });
   persist();
   dingOut();
   render();
-  toast(`${child.name} is out`);
+  toast(override ? `${child.name} is out (teacher override)` : `${child.name} is out`);
 }
 
 function tapReturn(id) {
@@ -581,11 +613,20 @@ function csvCell(v) {
 }
 
 function exportCsv() {
-  const header = ['Class', 'Name', 'Boy/Girl', 'Date', 'Time out', 'Time back', 'Minutes out'];
+  const header = ['Class', 'Name', 'Boy/Girl', 'Date', 'Time out', 'Time back', 'Minutes out', 'Teacher override'];
   const now = Date.now();
   const lines = filteredLog()
     .reverse()
-    .map(e => [e.className, e.childName, genderLabel(e.gender), localDate(e.outAt), fmtTime(e.outAt), e.backAt ? fmtTime(e.backAt) : 'still out', minutes((e.backAt ?? now) - e.outAt)]);
+    .map(e => [
+      e.className,
+      e.childName,
+      genderLabel(e.gender),
+      localDate(e.outAt),
+      fmtTime(e.outAt),
+      e.backAt ? fmtTime(e.backAt) : 'still out',
+      minutes((e.backAt ?? now) - e.outAt),
+      e.override ? 'Yes' : '',
+    ]);
   const csv = [header, ...lines].map(row => row.map(csvCell).join(',')).join('\r\n');
   download(`hallpass-history-${localDate(now)}.csv`, '﻿' + csv, 'text/csv');
 }

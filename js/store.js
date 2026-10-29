@@ -52,6 +52,7 @@ export function normalise(raw) {
       gender: e.gender === 'M' || e.gender === 'F' ? e.gender : '',
       outAt: e.outAt,
       backAt: typeof e.backAt === 'number' ? e.backAt : null,
+      ...(e.override === true && { override: true }),
     }));
   const activeClassId = classes.some(c => c.id === raw.activeClassId) ? raw.activeClassId : classes[0]?.id ?? null;
   return {

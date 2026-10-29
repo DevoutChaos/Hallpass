@@ -12,6 +12,7 @@ An offline classroom pass tracker. Children tap their name to go out and tap it 
 
 - **Class screen.** Shows the class list on the left and children who are out on the right (stacked on phones). It plays a ding when a child leaves or returns and an error sound when a tap is refused.
 - **Limits per class list.** Defaults: 2 boys and 2 girls out at once, 4 in total, and a child can't go out again within 45 minutes of last leaving. Leave a limit blank for no limit, or set the wait to 0 to turn it off.
+- **Teacher override.** If a child is refused, tapping their name 3 times within 20 seconds brings up the PIN pad. With the right PIN the child goes out anyway, just this once, and their wait timer restarts. Overrides are marked in History and the CSV.
 - **Several class lists.** List names must be different from each other. A child's name must be unique within its list but can appear on other lists. Boy/girl is optional; children without it only count toward the total limit.
 - **History.** Shows who is out now, totals per child, and every trip, filtered by list and date. You can export it as CSV.
 - **PIN lock.** You need a 4-digit PIN to leave the class screen. The screen also blocks the Back button, goes full screen and keeps the display awake.
