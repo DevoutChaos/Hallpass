@@ -2,6 +2,8 @@
 
 An offline classroom pass tracker. Children tap their name to go out and tap it again when they come back. Hallpass logs who left, when, and for how long.
 
+**Open or install it:** https://devoutchaos.github.io/Hallpass/
+
 - Works fully offline once installed. No accounts, no internet needed.
 - Shares nothing. Names and history are stored only in the browser on each device.
 - Runs on Android phones and tablets, iPad, and Windows (e.g. Galaxy Book) as an installable web app.
@@ -17,15 +19,13 @@ An offline classroom pass tracker. Children tap their name to go out and tap it 
 
 ## Putting it on your devices
 
-Browsers only allow offline install from an `https://` address, so the files need to be hosted once. Any static host works. GitHub Pages is free:
+Hallpass is hosted on GitHub Pages at **https://devoutchaos.github.io/Hallpass/**, published from the `main` branch. Pushing to `main` updates it.
 
-1. Push this folder to a GitHub repository.
-2. In the repository go to **Settings → Pages**, choose *Deploy from a branch*, pick `main` and `/ (root)`.
-3. Open the Pages address on each device and install it:
+1. Open that address on each device and install it:
    - **iPad / iPhone (Safari):** Share → *Add to Home Screen*.
    - **Android (Chrome):** menu → *Add to home screen* / *Install app*.
    - **Windows (Edge or Chrome):** the install icon in the address bar.
-4. Open it once from the home screen while online. After that it works without internet.
+2. Open it once from the home screen while online. After that it works without internet.
 
 The host only serves the app's files. Your class lists and history never leave the device.
 
