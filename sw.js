@@ -1,6 +1,6 @@
 // Caches the app's own files so it runs with no internet connection.
 // Bump CACHE whenever a file changes so devices pick up the new version.
-const CACHE = 'hallpass-v3';
+const CACHE = 'hallpass-v4';
 const FILES = [
   './',
   'index.html',
@@ -17,7 +17,9 @@ const FILES = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)));
+  // 'reload' skips the browser's HTTP cache, so a new version never stores stale copies of the files.
+  const requests = FILES.map(f => new Request(f, { cache: 'reload' }));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(requests)));
   self.skipWaiting();
 });
 

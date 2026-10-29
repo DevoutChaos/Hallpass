@@ -7,6 +7,7 @@ const modalRoot = document.getElementById('modal-root');
 const toastEl = document.getElementById('toast');
 
 let state;
+let updateReady = false; // a new app version is waiting to be shown
 const ui = {
   tab: 'classes',
   editClassId: null,
@@ -493,6 +494,7 @@ async function exitClassScreen() {
   wakeLock?.release().catch(() => {});
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   render();
+  reloadIfUpdated();
 }
 
 // ---------- actions ----------
@@ -850,6 +852,21 @@ state = await loadState();
 if (state.mode === 'class') lockDown();
 render();
 
+// When a new version takes over, reload to show it, but never interrupt the class screen:
+// wait until the teacher is back in settings.
+function reloadIfUpdated() {
+  if (updateReady && state.mode !== 'class') location.reload();
+}
+
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return; // first install, already showing the latest files
+    updateReady = true;
+    reloadIfUpdated();
+  });
+  navigator.serviceWorker
+    .register('sw.js', { updateViaCache: 'none' })
+    .then(reg => reg.update())
+    .catch(() => {});
 }

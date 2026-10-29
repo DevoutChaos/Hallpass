@@ -46,7 +46,7 @@ A web app can't block the Home button or app switching, because the operating sy
 
 ## Updating the app
 
-After changing any file, bump `CACHE` in `sw.js` (e.g. `hallpass-v2`) so installed copies fetch the new version the next time they open while online.
+After changing any file, bump `CACHE` in `sw.js` (e.g. `hallpass-v5`) and push. Installed copies check for a new version each time they open while online. They download it in the background and reload to show it. If the class screen is showing, the reload waits until the teacher returns to settings, so a lesson is never interrupted.
 
 ## Files
 
